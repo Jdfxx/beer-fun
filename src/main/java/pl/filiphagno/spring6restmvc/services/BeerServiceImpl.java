@@ -7,25 +7,64 @@ import pl.filiphagno.spring6restmvc.model.BeerStyle;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
 public class BeerServiceImpl implements BeerService {
 
-    @Override
-    public Beer getBeerById(UUID id) {
+    Map<UUID, Beer> beerMap;
 
-        log.debug("Service: getBeerById: {}", id);
-        return Beer.builder()
-                .id(id)
+    public BeerServiceImpl() {
+        this.beerMap = new HashMap<>();
+
+        Beer beer1 = Beer.builder()
+                .id(UUID.randomUUID())
                 .version(1)
-                .beerName("SomeBeer")
+                .beerName("SomeBeer1")
                 .beerStyle(BeerStyle.PORTER)
                 .price(new BigDecimal("4.65"))
                 .quantityOnHand(12)
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();
+
+
+        Beer beer2 = Beer.builder()
+                .id(UUID.randomUUID())
+                .version(1)
+                .beerName("SomeBeer2")
+                .beerStyle(BeerStyle.PORTER)
+                .price(new BigDecimal("4.65"))
+                .quantityOnHand(12)
+                .createdDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
+                .build();
+
+
+        Beer beer3 = Beer.builder()
+                .id(UUID.randomUUID())
+                .version(1)
+                .beerName("SomeBeer3")
+                .beerStyle(BeerStyle.PORTER)
+                .price(new BigDecimal("4.65"))
+                .quantityOnHand(12)
+                .createdDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
+                .build();
+        beerMap.put(beer1.id(), beer1);
+        beerMap.put(beer2.id(), beer2);
+        beerMap.put(beer3.id(), beer3);
+    }
+
+    @Override
+    public List<Beer> listBeers() {
+        return new ArrayList<>(beerMap.values());
+    }
+
+    @Override
+    public Beer getBeerById(UUID id) {
+        log.debug("Service: getBeerById: {}", id);
+        return beerMap.get(id);
     }
 }
