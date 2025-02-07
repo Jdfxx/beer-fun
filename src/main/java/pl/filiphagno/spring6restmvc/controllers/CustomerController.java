@@ -1,12 +1,12 @@
 package pl.filiphagno.spring6restmvc.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import pl.filiphagno.spring6restmvc.model.Customer;
 import pl.filiphagno.spring6restmvc.services.CustomerService;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +21,13 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+    @PostMapping("/customer")
+    public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer) {
+        Customer newCustomer = customerService.addCustomer(customer);
+        return ResponseEntity.created(URI.create("/api/v1/customer" + newCustomer.id()))
+                .build();
+    }
+
     @RequestMapping("/customers")
     public List<Customer> listCustomers() {
         return customerService.listCustomers();
@@ -29,5 +36,16 @@ public class CustomerController {
     @RequestMapping(value = "/customer/{id}")
     public Customer getCustomersById(@PathVariable("id") UUID id) {
         return customerService.getCustomersById(id);
+    }
+
+    @PutMapping("/customer/{id}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") UUID id, @RequestBody Customer customer) {
+        Customer customerToUpdate = customerService.getCustomersById(id);
+        if (customerToUpdate == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            customerService.updateCustomer(id, customer);
+        }
+        return ResponseEntity.ok().build();
     }
 }

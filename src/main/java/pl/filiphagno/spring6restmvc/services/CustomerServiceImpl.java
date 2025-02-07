@@ -43,6 +43,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Customer addCustomer(Customer customer) {
+
+        Customer newCustomer = Customer.builder()
+                .id(UUID.randomUUID())
+                .created(LocalDateTime.now())
+                .updated(LocalDateTime.now())
+                .name(customer.name())
+                .version(customer.version())
+                .build();
+        customers.put(newCustomer.id(), newCustomer);
+
+        return newCustomer;
+    }
+
+    @Override
     public List<Customer> listCustomers() {
         return new ArrayList<>(customers.values());
     }
@@ -50,5 +65,18 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer getCustomersById(UUID id) {
         return customers.get(id);
+    }
+
+    @Override
+    public void updateCustomer(UUID id, Customer customer) {
+        Customer oldCustomer = customers.get(id);
+        Customer newCustomer = Customer.builder()
+                .id(oldCustomer.id())
+                .name(customer.name())
+                .created(oldCustomer.created())
+                .updated(LocalDateTime.now())
+                .version(oldCustomer.version() + 1)
+                .build();
+        customers.put(id, newCustomer);
     }
 }
