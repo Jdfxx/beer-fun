@@ -9,6 +9,6 @@ public interface CustomerService {
     List<Customer> listCustomers();
     Customer getCustomersById(UUID id);
     Customer addCustomer(Customer customer);
-
+    Customer deleteCustomerById(UUID id);
     void updateCustomer(UUID id, Customer customer);
 }

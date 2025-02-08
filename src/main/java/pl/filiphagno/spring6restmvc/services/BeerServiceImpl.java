@@ -101,4 +101,9 @@ public class BeerServiceImpl implements BeerService {
         log.debug("Service: getBeerById: {}", id);
         return beerMap.get(id);
     }
+
+    @Override
+    public Beer removeBeerById(UUID id) {
+        return beerMap.remove(id);
+    }
 }

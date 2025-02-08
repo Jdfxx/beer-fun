@@ -48,4 +48,14 @@ public class CustomerController {
         }
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("customer/{id}")
+    public ResponseEntity<Customer> deleteCustomerById(@PathVariable("id") UUID id) {
+        Customer removedCustomer = customerService.deleteCustomerById(id);
+        if(removedCustomer == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(removedCustomer);
+        }
+    }
 }
