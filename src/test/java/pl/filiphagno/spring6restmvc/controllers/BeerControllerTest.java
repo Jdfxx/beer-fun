@@ -2,20 +2,30 @@ package pl.filiphagno.spring6restmvc.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import pl.filiphagno.spring6restmvc.model.Beer;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import pl.filiphagno.spring6restmvc.services.BeerService;
 
 import java.util.UUID;
 
-@SpringBootTest
-class BeerControllerTest {
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(BeerController.class)
+class BeerControllerTest {
     @Autowired
-    BeerController controller;
+    MockMvc mockMvc;
+
+    @MockitoBean
+    BeerService beerService;
 
     @Test
-    void getBeerByIdTest() {
-        UUID id = UUID.randomUUID();
-        Beer beer = controller.getBeerById(id);
+    void getBeerById() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/beer/" + UUID.randomUUID())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
+
 }
