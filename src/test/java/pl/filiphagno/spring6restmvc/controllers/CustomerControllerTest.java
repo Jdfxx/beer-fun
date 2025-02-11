@@ -1,5 +1,6 @@
 package pl.filiphagno.spring6restmvc.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
@@ -27,7 +29,28 @@ class CustomerControllerTest {
     @MockitoBean
     CustomerService customerService;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     CustomerServiceImpl customerServiceImpl = new CustomerServiceImpl();
+
+
+    @Test
+    void createCustomer() throws Exception {
+        Customer customer = Customer.builder()
+                .id(UUID.randomUUID())
+                .name("Test Name")
+                .build();
+        given(customerService.addCustomer(any(Customer.class))).willReturn(customer);
+
+        mockMvc.perform(post("/api/v1/customer")
+            .content(objectMapper.writeValueAsString(customer))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isCreated())
+        .andExpect(header().exists("Location"))
+        .andExpect(header().string("Location", "/api/v1/customer/" + customer.id()));
+
+    }
 
     @Test
     void getListCustomers() throws Exception {
