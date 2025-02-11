@@ -12,11 +12,14 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
+import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(BASE_URI)
 public class BeerController {
+    public static final String BASE_URI = "/api/v1";
     private final BeerService beerService;
 
     @RequestMapping("/beers")
@@ -33,7 +36,7 @@ public class BeerController {
     @PostMapping(value = "/beer")
     public ResponseEntity<String> createBeer(@RequestBody Beer beer) throws URISyntaxException {
         Beer savedBeer = beerService.addBeer(beer);
-        return ResponseEntity.created(new URI("api/v1/beer/" + savedBeer.id())).build();
+        return ResponseEntity.created(new URI(BASE_URI +"/beer/" + savedBeer.id())).build();
     }
 
     @PutMapping("/beer/{id}")

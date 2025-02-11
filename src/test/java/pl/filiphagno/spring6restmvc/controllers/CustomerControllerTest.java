@@ -1,6 +1,7 @@
 package pl.filiphagno.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,16 @@ class CustomerControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    CustomerServiceImpl customerServiceImpl = new CustomerServiceImpl();
+    static CustomerServiceImpl customerServiceImpl;
 
+    static Customer testCustomer;
+
+
+    @BeforeAll
+    static void setUp() {
+        customerServiceImpl = new CustomerServiceImpl();
+        testCustomer = customerServiceImpl.listCustomers().getFirst();
+    }
 
     @Test
     void createCustomer() throws Exception {
@@ -66,8 +75,6 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById() throws Exception {
-        Customer testCustomer = customerServiceImpl.listCustomers().getFirst();
-
         given(customerService.getCustomersById(any(UUID.class))).willReturn(testCustomer);
 
         mockMvc.perform(get("/api/v1/customer/" + UUID.randomUUID())
@@ -80,8 +87,6 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
-        Customer testCustomer = customerServiceImpl.listCustomers().getFirst();
-
         given(customerService.getCustomersById(any(UUID.class))).willReturn(testCustomer);
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomer.id())
@@ -94,7 +99,6 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomer() throws Exception {
-        Customer testCustomer = customerServiceImpl.listCustomers().getFirst();
         given(customerService.deleteCustomerById(any(UUID.class))).willReturn(testCustomer);
 
         mockMvc.perform(delete("/api/v1/customer/" + testCustomer.id())

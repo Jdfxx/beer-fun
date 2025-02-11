@@ -1,6 +1,7 @@
 package pl.filiphagno.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import pl.filiphagno.spring6restmvc.services.BeerService;
 import pl.filiphagno.spring6restmvc.services.BeerServiceImpl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -22,8 +22,8 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
 import static pl.filiphagno.spring6restmvc.model.BeerStyle.STOUT;
 
 @WebMvcTest(BeerController.class)
@@ -37,8 +37,14 @@ class BeerControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    static Beer testBeer;
+    static BeerServiceImpl beerServiceImpl;
 
-    BeerServiceImpl beerServiceImpl = new BeerServiceImpl();
+    @BeforeAll
+    static void setUp() {
+        beerServiceImpl = new BeerServiceImpl();
+        testBeer = beerServiceImpl.listBeers().getFirst();
+    }
 
     @Test
     void createBeer() throws Exception {
@@ -51,21 +57,19 @@ class BeerControllerTest {
 
         given(beerService.addBeer(any(Beer.class))).willReturn(beer);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/beer")
+        mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI +"/beer")
                     .content(objectMapper.writeValueAsString(beer))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
-                .andExpect(header().string("Location", "api/v1/beer/" + beer.id()));
+                .andExpect(header().string("Location", BASE_URI + "/beer/" + beer.id()));
     }
 
     @Test
     void getBeerById() throws Exception {
-        Beer testBeer = beerServiceImpl.listBeers().getFirst();
-
         given(beerService.getBeerById(testBeer.id())).willReturn(testBeer);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/beer/" + testBeer.id())
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI +"/beer/" + testBeer.id())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -76,10 +80,7 @@ class BeerControllerTest {
     @Test
     void getListBeers() throws Exception {
         given(beerService.listBeers()).willReturn(beerServiceImpl.listBeers());
-
-
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/beers")
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -88,9 +89,8 @@ class BeerControllerTest {
 
     @Test
     void updateBeerWhenBeerExist() throws Exception {
-        Beer testBeer = beerServiceImpl.listBeers().getFirst();
         given(beerService.getBeerById(testBeer.id())).willReturn(testBeer);
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/beer/" + testBeer.id())
+        mockMvc.perform(MockMvcRequestBuilders.put(BASE_URI + "/beer/" + testBeer.id())
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testBeer))
                 .contentType(MediaType.APPLICATION_JSON));
@@ -100,9 +100,8 @@ class BeerControllerTest {
 
     @Test
     void deleteBeer() throws Exception {
-        Beer testBeer = beerServiceImpl.listBeers().getFirst();
         given(beerService.removeBeerById(testBeer.id())).willReturn(testBeer);
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/beer/" + testBeer.id())
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeer.id())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
