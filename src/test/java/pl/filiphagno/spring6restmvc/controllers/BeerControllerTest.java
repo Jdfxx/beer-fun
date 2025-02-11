@@ -2,6 +2,7 @@ package pl.filiphagno.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -96,5 +98,15 @@ class BeerControllerTest {
         verify(beerService).updateBeer(any(UUID.class), any(Beer.class));
     }
 
-
+    @Test
+    void deleteBeer() throws Exception {
+        Beer testBeer = beerServiceImpl.listBeers().getFirst();
+        given(beerService.removeBeerById(testBeer.id())).willReturn(testBeer);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/beer/" + testBeer.id())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
+        verify(beerService).removeBeerById(argumentCaptor.capture());
+        assertThat(testBeer.id()).isEqualTo(argumentCaptor.getValue());
+    }
 }

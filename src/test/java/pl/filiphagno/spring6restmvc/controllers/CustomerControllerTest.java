@@ -2,6 +2,7 @@ package pl.filiphagno.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import pl.filiphagno.spring6restmvc.services.CustomerServiceImpl;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -88,5 +90,21 @@ class CustomerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         verify(customerService).updateCustomer(any(UUID.class), any(Customer.class));
+    }
+
+    @Test
+    void deleteCustomer() throws Exception {
+        Customer testCustomer = customerServiceImpl.listCustomers().getFirst();
+        given(customerService.deleteCustomerById(any(UUID.class))).willReturn(testCustomer);
+
+        mockMvc.perform(delete("/api/v1/customer/" + testCustomer.id())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(testCustomer.id().toString())));
+
+        ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
+        verify(customerService).deleteCustomerById(argumentCaptor.capture());
+        assertThat(testCustomer.id()).isEqualTo(argumentCaptor.getValue());
     }
 }
