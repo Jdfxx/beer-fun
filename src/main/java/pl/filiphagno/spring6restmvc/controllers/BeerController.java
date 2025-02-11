@@ -36,7 +36,7 @@ public class BeerController {
         return ResponseEntity.created(new URI("api/v1/beer/" + savedBeer.id())).build();
     }
 
-    @PutMapping("beer/{id}")
+    @PutMapping("/beer/{id}")
     public ResponseEntity<String> updateBeer(@PathVariable("id") UUID id, @RequestBody Beer beer) {
         log.debug("Controller: Got beer by id {} to be updated", id);
         Beer beerToUpdate = beerService.getBeerById(id);

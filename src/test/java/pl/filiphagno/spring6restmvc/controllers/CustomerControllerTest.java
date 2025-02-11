@@ -16,8 +16,8 @@ import java.util.UUID;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
@@ -74,5 +74,19 @@ class CustomerControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(testCustomer.id().toString())))
                 .andExpect(jsonPath("$.name", is(testCustomer.name())));
+    }
+
+    @Test
+    void updateCustomer() throws Exception {
+        Customer testCustomer = customerServiceImpl.listCustomers().getFirst();
+
+        given(customerService.getCustomersById(any(UUID.class))).willReturn(testCustomer);
+
+        mockMvc.perform(put("/api/v1/customer/" + testCustomer.id())
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testCustomer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        verify(customerService).updateCustomer(any(UUID.class), any(Customer.class));
     }
 }

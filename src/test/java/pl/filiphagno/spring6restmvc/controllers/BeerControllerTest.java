@@ -13,11 +13,14 @@ import pl.filiphagno.spring6restmvc.services.BeerService;
 import pl.filiphagno.spring6restmvc.services.BeerServiceImpl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static pl.filiphagno.spring6restmvc.model.BeerStyle.STOUT;
 
@@ -72,10 +75,26 @@ class BeerControllerTest {
     void getListBeers() throws Exception {
         given(beerService.listBeers()).willReturn(beerServiceImpl.listBeers());
 
+
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/beers")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()", is(3)));
     }
+
+    @Test
+    void updateBeerWhenBeerExist() throws Exception {
+        Beer testBeer = beerServiceImpl.listBeers().getFirst();
+        given(beerService.getBeerById(testBeer.id())).willReturn(testBeer);
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/beer/" + testBeer.id())
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testBeer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        verify(beerService).updateBeer(any(UUID.class), any(Beer.class));
+    }
+
+
 }
