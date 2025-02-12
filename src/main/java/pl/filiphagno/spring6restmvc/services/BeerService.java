@@ -1,19 +1,19 @@
 package pl.filiphagno.spring6restmvc.services;
 
-import pl.filiphagno.spring6restmvc.model.Beer;
+import pl.filiphagno.spring6restmvc.model.BeerDTO;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface BeerService {
-    Optional<Beer> getBeerById(UUID id);
+    Optional<BeerDTO> getBeerById(UUID id);
 
-    List<Beer> listBeers();
+    List<BeerDTO> listBeers();
 
-    Beer addBeer(Beer beer);
+    BeerDTO addBeer(BeerDTO beerDTO);
 
-    void updateBeer(UUID id, Beer beer);
+    void updateBeer(UUID id, BeerDTO beerDTO);
 
-    Optional<Beer> removeBeerById(UUID id);
+    Optional<BeerDTO> removeBeerById(UUID id);
 }

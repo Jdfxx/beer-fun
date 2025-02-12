@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
-public record Beer (
+public record BeerDTO(
     UUID id,
     Integer version,
     String beerName,

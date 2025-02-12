@@ -3,7 +3,7 @@ package pl.filiphagno.spring6restmvc.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.filiphagno.spring6restmvc.model.Customer;
+import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 import pl.filiphagno.spring6restmvc.services.CustomerService;
 
 import java.net.URI;
@@ -22,32 +22,32 @@ public class CustomerController {
     }
 
     @PostMapping("/customer")
-    public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer) {
-        Customer newCustomer = customerService.addCustomer(customer);
-        return ResponseEntity.created(URI.create("/api/v1/customer/" + newCustomer.id()))
+    public ResponseEntity<CustomerDTO> addCustomer(@RequestBody CustomerDTO customerDTO) {
+        CustomerDTO newCustomerDTO = customerService.addCustomer(customerDTO);
+        return ResponseEntity.created(URI.create("/api/v1/customer/" + newCustomerDTO.id()))
                 .build();
     }
 
     @RequestMapping("/customers")
-    public List<Customer> listCustomers() {
+    public List<CustomerDTO> listCustomers() {
         return customerService.listCustomers();
     }
 
     @RequestMapping(value = "/customer/{id}")
-    public Customer getCustomersById(@PathVariable("id") UUID id) {
+    public CustomerDTO getCustomersById(@PathVariable("id") UUID id) {
         return customerService.getCustomersById(id).orElseThrow(NotFoundException::new);
     }
 
     @PutMapping("/customer/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable("id") UUID id, @RequestBody Customer customer) {
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable("id") UUID id, @RequestBody CustomerDTO customerDTO) {
         customerService.getCustomersById(id).orElseThrow(NotFoundException::new);
-        customerService.updateCustomer(id, customer);
+        customerService.updateCustomer(id, customerDTO);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("customer/{id}")
-    public ResponseEntity<Customer> deleteCustomerById(@PathVariable("id") UUID id) {
-        Customer removedCustomer = customerService.deleteCustomerById(id).orElseThrow(NotFoundException::new);
-        return ResponseEntity.ok(removedCustomer);
+    public ResponseEntity<CustomerDTO> deleteCustomerById(@PathVariable("id") UUID id) {
+        CustomerDTO removedCustomerDTO = customerService.deleteCustomerById(id).orElseThrow(NotFoundException::new);
+        return ResponseEntity.ok(removedCustomerDTO);
     }
 }

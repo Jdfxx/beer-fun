@@ -1,7 +1,7 @@
 package pl.filiphagno.spring6restmvc.services;
 
 import org.springframework.stereotype.Service;
-import pl.filiphagno.spring6restmvc.model.Customer;
+import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -9,26 +9,26 @@ import java.util.*;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    Map<UUID, Customer> customers;
+    Map<UUID, CustomerDTO> customers;
 
     public CustomerServiceImpl() {
         this.customers = new HashMap<>();
 
-        Customer customer1 = Customer.builder()
+        CustomerDTO customerDTO1 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("John Doe")
                 .version(1)
                 .created(LocalDateTime.now())
                 .updated(LocalDateTime.now())
                 .build();
-        Customer customer2 = Customer.builder()
+        CustomerDTO customerDTO2 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("Jane Doe")
                 .version(1)
                 .created(LocalDateTime.now())
                 .updated(LocalDateTime.now())
                 .build();
-        Customer customer3 = Customer.builder()
+        CustomerDTO customerDTO3 = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("Frank Doe")
                 .version(1)
@@ -36,52 +36,52 @@ public class CustomerServiceImpl implements CustomerService {
                 .updated(LocalDateTime.now())
                 .build();
 
-        customers.put(customer1.id(), customer1);
-        customers.put(customer2.id(), customer2);
-        customers.put(customer3.id(), customer3);
+        customers.put(customerDTO1.id(), customerDTO1);
+        customers.put(customerDTO2.id(), customerDTO2);
+        customers.put(customerDTO3.id(), customerDTO3);
 
     }
 
     @Override
-    public Customer addCustomer(Customer customer) {
+    public CustomerDTO addCustomer(CustomerDTO customerDTO) {
 
-        Customer newCustomer = Customer.builder()
+        CustomerDTO newCustomerDTO = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .created(LocalDateTime.now())
                 .updated(LocalDateTime.now())
-                .name(customer.name())
-                .version(customer.version())
+                .name(customerDTO.name())
+                .version(customerDTO.version())
                 .build();
-        customers.put(newCustomer.id(), newCustomer);
+        customers.put(newCustomerDTO.id(), newCustomerDTO);
 
-        return newCustomer;
+        return newCustomerDTO;
     }
 
     @Override
-    public List<Customer> listCustomers() {
+    public List<CustomerDTO> listCustomers() {
         return new ArrayList<>(customers.values());
     }
 
     @Override
-    public Optional<Customer> getCustomersById(UUID id) {
+    public Optional<CustomerDTO> getCustomersById(UUID id) {
         return Optional.ofNullable(customers.get(id));
     }
 
     @Override
-    public void updateCustomer(UUID id, Customer customer) {
-        Customer oldCustomer = customers.get(id);
-        Customer newCustomer = Customer.builder()
-                .id(oldCustomer.id())
-                .name(customer.name())
-                .created(oldCustomer.created())
+    public void updateCustomer(UUID id, CustomerDTO customerDTO) {
+        CustomerDTO oldCustomerDTO = customers.get(id);
+        CustomerDTO newCustomerDTO = CustomerDTO.builder()
+                .id(oldCustomerDTO.id())
+                .name(customerDTO.name())
+                .created(oldCustomerDTO.created())
                 .updated(LocalDateTime.now())
-                .version(oldCustomer.version() + 1)
+                .version(oldCustomerDTO.version() + 1)
                 .build();
-        customers.put(id, newCustomer);
+        customers.put(id, newCustomerDTO);
     }
 
     @Override
-    public Optional<Customer> deleteCustomerById(UUID id) {
+    public Optional<CustomerDTO> deleteCustomerById(UUID id) {
         return Optional.ofNullable(customers.remove(id));
     }
 }

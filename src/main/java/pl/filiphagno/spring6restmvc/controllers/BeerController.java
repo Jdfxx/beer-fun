@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.filiphagno.spring6restmvc.model.Beer;
+import pl.filiphagno.spring6restmvc.model.BeerDTO;
 import pl.filiphagno.spring6restmvc.services.BeerService;
 
 import java.net.URI;
@@ -23,33 +23,33 @@ public class BeerController {
     private final BeerService beerService;
 
     @RequestMapping("/beers")
-    public List<Beer> listBeers() {
+    public List<BeerDTO> listBeers() {
         return beerService.listBeers();
     }
 
     @GetMapping(value = "/beer/{beerId}")
-    public Beer getBeerById(@PathVariable("beerId") UUID beerId) {
+    public BeerDTO getBeerById(@PathVariable("beerId") UUID beerId) {
         log.debug("Controller: Got beer by id {}", beerId);
         return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping(value = "/beer")
-    public ResponseEntity<String> createBeer(@RequestBody Beer beer) throws URISyntaxException {
-        Beer savedBeer = beerService.addBeer(beer);
-        return ResponseEntity.created(new URI(BASE_URI +"/beer/" + savedBeer.id())).build();
+    public ResponseEntity<String> createBeer(@RequestBody BeerDTO beerDTO) throws URISyntaxException {
+        BeerDTO savedBeerDTO = beerService.addBeer(beerDTO);
+        return ResponseEntity.created(new URI(BASE_URI +"/beer/" + savedBeerDTO.id())).build();
     }
 
     @PutMapping("/beer/{id}")
-    public ResponseEntity<String> updateBeer(@PathVariable("id") UUID id, @RequestBody Beer beer) {
+    public ResponseEntity<String> updateBeer(@PathVariable("id") UUID id, @RequestBody BeerDTO beerDTO) {
         log.debug("Controller: Got beer by id {} to be updated", id);
         beerService.getBeerById(id).orElseThrow(NotFoundException::new);
-        beerService.updateBeer(id, beer);
+        beerService.updateBeer(id, beerDTO);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("beer/{id}")
-    public ResponseEntity<Beer> deleteBeer(@PathVariable("id") UUID id) {
-        Beer removedBeer =  beerService.removeBeerById(id).orElseThrow(NotFoundException::new);
-        return ResponseEntity.ok(removedBeer);
+    public ResponseEntity<BeerDTO> deleteBeer(@PathVariable("id") UUID id) {
+        BeerDTO removedBeerDTO =  beerService.removeBeerById(id).orElseThrow(NotFoundException::new);
+        return ResponseEntity.ok(removedBeerDTO);
     }
 }
