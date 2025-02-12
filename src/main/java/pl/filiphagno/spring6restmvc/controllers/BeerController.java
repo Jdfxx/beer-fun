@@ -27,10 +27,10 @@ public class BeerController {
         return beerService.listBeers();
     }
 
-    @RequestMapping(value = "/beer/{beerId}", method = RequestMethod.GET)
+    @GetMapping(value = "/beer/{beerId}")
     public Beer getBeerById(@PathVariable("beerId") UUID beerId) {
         log.debug("Controller: Got beer by id {}", beerId);
-        return beerService.getBeerById(beerId);
+        return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping(value = "/beer")
@@ -42,23 +42,14 @@ public class BeerController {
     @PutMapping("/beer/{id}")
     public ResponseEntity<String> updateBeer(@PathVariable("id") UUID id, @RequestBody Beer beer) {
         log.debug("Controller: Got beer by id {} to be updated", id);
-        Beer beerToUpdate = beerService.getBeerById(id);
-        if (beerToUpdate == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            beerService.updateBeer(id, beer);
-        }
+        beerService.getBeerById(id).orElseThrow(NotFoundException::new);
+        beerService.updateBeer(id, beer);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("beer/{id}")
     public ResponseEntity<Beer> deleteBeer(@PathVariable("id") UUID id) {
-        Beer removedBeer =  beerService.removeBeerById(id);
-        if(removedBeer == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(removedBeer);
-        }
+        Beer removedBeer =  beerService.removeBeerById(id).orElseThrow(NotFoundException::new);
+        return ResponseEntity.ok(removedBeer);
     }
-
 }

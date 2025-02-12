@@ -15,6 +15,7 @@ import pl.filiphagno.spring6restmvc.services.BeerService;
 import pl.filiphagno.spring6restmvc.services.BeerServiceImpl;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -66,8 +67,17 @@ class BeerControllerTest {
     }
 
     @Test
+    void getBeerByIdNotFound() throws Exception {
+
+        given(beerService.getBeerById(any(UUID.class))).willReturn(Optional.empty());
+
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beer/" + UUID.randomUUID()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getBeerById() throws Exception {
-        given(beerService.getBeerById(testBeer.id())).willReturn(testBeer);
+        given(beerService.getBeerById(testBeer.id())).willReturn(Optional.of(testBeer));
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI +"/beer/" + testBeer.id())
                         .accept(MediaType.APPLICATION_JSON))
@@ -89,7 +99,7 @@ class BeerControllerTest {
 
     @Test
     void updateBeerWhenBeerExist() throws Exception {
-        given(beerService.getBeerById(testBeer.id())).willReturn(testBeer);
+        given(beerService.getBeerById(testBeer.id())).willReturn(Optional.of(testBeer));
         mockMvc.perform(MockMvcRequestBuilders.put(BASE_URI + "/beer/" + testBeer.id())
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testBeer))
@@ -100,7 +110,7 @@ class BeerControllerTest {
 
     @Test
     void deleteBeer() throws Exception {
-        given(beerService.removeBeerById(testBeer.id())).willReturn(testBeer);
+        given(beerService.removeBeerById(testBeer.id())).willReturn(Optional.ofNullable(testBeer));
         mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeer.id())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

@@ -35,27 +35,19 @@ public class CustomerController {
 
     @RequestMapping(value = "/customer/{id}")
     public Customer getCustomersById(@PathVariable("id") UUID id) {
-        return customerService.getCustomersById(id);
+        return customerService.getCustomersById(id).orElseThrow(NotFoundException::new);
     }
 
     @PutMapping("/customer/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable("id") UUID id, @RequestBody Customer customer) {
-        Customer customerToUpdate = customerService.getCustomersById(id);
-        if (customerToUpdate == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            customerService.updateCustomer(id, customer);
-        }
+        customerService.getCustomersById(id).orElseThrow(NotFoundException::new);
+        customerService.updateCustomer(id, customer);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("customer/{id}")
     public ResponseEntity<Customer> deleteCustomerById(@PathVariable("id") UUID id) {
-        Customer removedCustomer = customerService.deleteCustomerById(id);
-        if(removedCustomer == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(removedCustomer);
-        }
+        Customer removedCustomer = customerService.deleteCustomerById(id).orElseThrow(NotFoundException::new);
+        return ResponseEntity.ok(removedCustomer);
     }
 }

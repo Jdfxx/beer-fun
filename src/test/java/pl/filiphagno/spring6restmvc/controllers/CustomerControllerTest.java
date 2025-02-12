@@ -13,6 +13,7 @@ import pl.filiphagno.spring6restmvc.model.Customer;
 import pl.filiphagno.spring6restmvc.services.CustomerService;
 import pl.filiphagno.spring6restmvc.services.CustomerServiceImpl;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -75,7 +76,7 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById() throws Exception {
-        given(customerService.getCustomersById(any(UUID.class))).willReturn(testCustomer);
+        given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomer));
 
         mockMvc.perform(get("/api/v1/customer/" + UUID.randomUUID())
                 .accept(MediaType.APPLICATION_JSON))
@@ -87,7 +88,7 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
-        given(customerService.getCustomersById(any(UUID.class))).willReturn(testCustomer);
+        given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomer));
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomer.id())
                 .accept(MediaType.APPLICATION_JSON)
@@ -99,7 +100,7 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomer() throws Exception {
-        given(customerService.deleteCustomerById(any(UUID.class))).willReturn(testCustomer);
+        given(customerService.deleteCustomerById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomer));
 
         mockMvc.perform(delete("/api/v1/customer/" + testCustomer.id())
                 .accept(MediaType.APPLICATION_JSON))

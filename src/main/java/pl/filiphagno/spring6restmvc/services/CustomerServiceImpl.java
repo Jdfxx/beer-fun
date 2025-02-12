@@ -63,8 +63,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer getCustomersById(UUID id) {
-        return customers.get(id);
+    public Optional<Customer> getCustomersById(UUID id) {
+        return Optional.ofNullable(customers.get(id));
     }
 
     @Override
@@ -81,7 +81,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer deleteCustomerById(UUID id) {
-        return customers.remove(id);
+    public Optional<Customer> deleteCustomerById(UUID id) {
+        return Optional.ofNullable(customers.remove(id));
     }
 }
