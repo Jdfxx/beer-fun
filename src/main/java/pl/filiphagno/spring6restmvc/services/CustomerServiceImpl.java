@@ -7,6 +7,7 @@ import pl.filiphagno.spring6restmvc.repositories.CustomerRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -38,7 +39,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> listCustomers() {
-        return new ArrayList<>(customers.values());
+        return customerRepository.findAll().stream()
+                .map(customerMapper::customerToCustomerDTO)
+                .collect(Collectors.toList());
     }
 
     @Override

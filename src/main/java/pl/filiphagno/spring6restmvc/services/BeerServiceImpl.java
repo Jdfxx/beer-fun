@@ -27,7 +27,7 @@ public class BeerServiceImpl implements BeerService {
     @Override
     public List<BeerDTO> listBeers() {
         return beerRepository.findAll().stream()
-                .map(beer -> beerMapper.beerToBeerDTO(beer))
+                .map(beerMapper::beerToBeerDTO)
                 .collect(Collectors.toList());
     }
 
@@ -44,12 +44,8 @@ public class BeerServiceImpl implements BeerService {
 
     @Override
     public Optional<BeerDTO> getBeerById(UUID id) {
-        log.debug("Service: getBeerById: {}", id);
-        if(beerRepository.findById(id).isPresent()) {
-            return Optional.of(beerMapper.beerToBeerDTO(beerRepository.findById(id).get()));
-        } else {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(beerMapper.beerToBeerDTO(
+                beerRepository.findById(id).orElse(null)));
     }
 
     @Override
