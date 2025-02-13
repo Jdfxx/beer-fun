@@ -48,8 +48,8 @@ public class BeerController {
     }
 
     @DeleteMapping("beer/{id}")
-    public ResponseEntity<BeerDTO> deleteBeer(@PathVariable("id") UUID id) {
-        BeerDTO removedBeerDTO =  beerService.removeBeerById(id).orElseThrow(NotFoundException::new);
-        return ResponseEntity.ok(removedBeerDTO);
+    public ResponseEntity<String> deleteBeer(@PathVariable("id") UUID id) {
+        beerService.removeBeerById(id);
+        return ResponseEntity.ok().build();
     }
 }

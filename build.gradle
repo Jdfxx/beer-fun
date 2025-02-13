@@ -7,6 +7,8 @@ plugins {
 group = 'pl.filiphagno'
 version = '0.0.1-SNAPSHOT'
 
+
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -24,15 +26,20 @@ repositories {
 }
 
 dependencies {
+    def mapStructVersion = "1.5.2.Final"
+
+    implementation "org.mapstruct:mapstruct:$mapStructVersion"
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
     testImplementation 'com.jayway.jsonpath:json-path:2.9.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

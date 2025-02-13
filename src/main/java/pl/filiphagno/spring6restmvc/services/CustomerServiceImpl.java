@@ -1,7 +1,9 @@
 package pl.filiphagno.spring6restmvc.services;
 
 import org.springframework.stereotype.Service;
+import pl.filiphagno.spring6restmvc.mappers.CustomerMapper;
 import pl.filiphagno.spring6restmvc.model.CustomerDTO;
+import pl.filiphagno.spring6restmvc.repositories.CustomerRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -10,36 +12,13 @@ import java.util.*;
 public class CustomerServiceImpl implements CustomerService {
 
     Map<UUID, CustomerDTO> customers;
+    CustomerRepository customerRepository;
+    CustomerMapper customerMapper;
 
-    public CustomerServiceImpl() {
+    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerMapper) {
         this.customers = new HashMap<>();
-
-        CustomerDTO customerDTO1 = CustomerDTO.builder()
-                .id(UUID.randomUUID())
-                .name("John Doe")
-                .version(1)
-                .created(LocalDateTime.now())
-                .updated(LocalDateTime.now())
-                .build();
-        CustomerDTO customerDTO2 = CustomerDTO.builder()
-                .id(UUID.randomUUID())
-                .name("Jane Doe")
-                .version(1)
-                .created(LocalDateTime.now())
-                .updated(LocalDateTime.now())
-                .build();
-        CustomerDTO customerDTO3 = CustomerDTO.builder()
-                .id(UUID.randomUUID())
-                .name("Frank Doe")
-                .version(1)
-                .created(LocalDateTime.now())
-                .updated(LocalDateTime.now())
-                .build();
-
-        customers.put(customerDTO1.id(), customerDTO1);
-        customers.put(customerDTO2.id(), customerDTO2);
-        customers.put(customerDTO3.id(), customerDTO3);
-
+        this.customerRepository = customerRepository;
+        this.customerMapper = customerMapper;
     }
 
     @Override
@@ -81,7 +60,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Optional<CustomerDTO> deleteCustomerById(UUID id) {
-        return Optional.ofNullable(customers.remove(id));
+    public void deleteCustomerById(UUID id) {
+         customerRepository.deleteById(id);
     }
 }

@@ -1,17 +1,14 @@
 package pl.filiphagno.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 import pl.filiphagno.spring6restmvc.services.CustomerService;
-import pl.filiphagno.spring6restmvc.services.CustomerServiceImpl;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -30,22 +27,12 @@ class CustomerControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @MockitoBean
+    @Autowired
     CustomerService customerService;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    static CustomerServiceImpl customerServiceImpl;
-
-    static CustomerDTO testCustomerDTO;
-
-
-    @BeforeAll
-    static void setUp() {
-        customerServiceImpl = new CustomerServiceImpl();
-        testCustomerDTO = customerServiceImpl.listCustomers().getFirst();
-    }
 
     @Test
     void createCustomer() throws Exception {
@@ -66,7 +53,7 @@ class CustomerControllerTest {
 
     @Test
     void getListCustomers() throws Exception {
-        given(customerService.listCustomers()).willReturn(customerServiceImpl.listCustomers());
+        given(customerService.listCustomers()).willReturn(customerService.listCustomers());
 
         mockMvc.perform(get("/api/v1/customers").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -76,6 +63,9 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById() throws Exception {
+
+        CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
+
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
         mockMvc.perform(get("/api/v1/customer/" + UUID.randomUUID())
@@ -88,6 +78,8 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
+
+        CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomerDTO.id())
@@ -100,8 +92,7 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomer() throws Exception {
-        given(customerService.deleteCustomerById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
-
+        CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
         mockMvc.perform(delete("/api/v1/customer/" + testCustomerDTO.id())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

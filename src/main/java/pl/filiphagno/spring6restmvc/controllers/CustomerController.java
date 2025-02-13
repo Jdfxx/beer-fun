@@ -47,7 +47,7 @@ public class CustomerController {
 
     @DeleteMapping("customer/{id}")
     public ResponseEntity<CustomerDTO> deleteCustomerById(@PathVariable("id") UUID id) {
-        CustomerDTO removedCustomerDTO = customerService.deleteCustomerById(id).orElseThrow(NotFoundException::new);
-        return ResponseEntity.ok(removedCustomerDTO);
+        customerService.deleteCustomerById(id);
+        return ResponseEntity.ok().build();
     }
 }
