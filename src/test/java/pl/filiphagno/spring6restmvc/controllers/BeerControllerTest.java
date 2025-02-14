@@ -1,17 +1,23 @@
 package pl.filiphagno.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
+import pl.filiphagno.spring6restmvc.model.BeerStyle;
 import pl.filiphagno.spring6restmvc.services.BeerService;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,17 +30,62 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
 import static pl.filiphagno.spring6restmvc.model.BeerStyle.STOUT;
 
-@WebMvcTest(BeerController.class)
+@WebMvcTest(controllers = BeerController.class)
 class BeerControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @Autowired
+    @MockitoBean
     BeerService beerService;
 
     @Autowired
     ObjectMapper objectMapper;
 
+    List<BeerDTO> beerDTOList;
+
+    @BeforeEach
+    void setUp() {
+        beerDTOList = setupData();
+    }
+
+    private List<BeerDTO> setupData() {
+        BeerDTO beer1 = BeerDTO.builder()
+                .id(UUID.randomUUID())
+                .beerName("SomeBeer1")
+                .beerStyle(BeerStyle.PORTER)
+                .price(new BigDecimal("4.65"))
+                .quantityOnHand(12)
+                .createdDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
+                .build();
+
+
+        BeerDTO beer2 = BeerDTO.builder()
+                .id(UUID.randomUUID())
+                .beerName("SomeBeer2")
+                .beerStyle(BeerStyle.PORTER)
+                .price(new BigDecimal("4.65"))
+                .quantityOnHand(12)
+                .createdDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
+                .build();
+
+
+        BeerDTO beer3 = BeerDTO.builder()
+                .id(UUID.randomUUID())
+                .beerName("SomeBeer3")
+                .beerStyle(BeerStyle.PORTER)
+                .price(new BigDecimal("4.65"))
+                .quantityOnHand(12)
+                .createdDate(LocalDateTime.now())
+                .updatedDate(LocalDateTime.now())
+                .build();
+        List<BeerDTO> beerDTOList = new ArrayList<>();
+        beerDTOList.add(beer1);
+        beerDTOList.add(beer2);
+        beerDTOList.add(beer3);
+        return beerDTOList;
+    }
 
     @Test
     void createBeer() throws Exception {
@@ -66,7 +117,7 @@ class BeerControllerTest {
 
     @Test
     void getBeerById() throws Exception {
-
+        given(beerService.listBeers()).willReturn(beerDTOList);
         BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
         assert testBeerDTO != null;
         given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
@@ -81,7 +132,7 @@ class BeerControllerTest {
 
     @Test
     void getListBeers() throws Exception {
-        given(beerService.listBeers()).willReturn(beerService.listBeers());
+        given(beerService.listBeers()).willReturn(beerDTOList);
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -91,6 +142,7 @@ class BeerControllerTest {
 
     @Test
     void updateBeerWhenBeerExist() throws Exception {
+        given(beerService.listBeers()).willReturn(beerDTOList);
         BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
         assert testBeerDTO != null;
         given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
@@ -104,6 +156,7 @@ class BeerControllerTest {
 
     @Test
     void deleteBeer() throws Exception {
+        given(beerService.listBeers()).willReturn(beerDTOList);
         BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
         mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeerDTO.id())
                 .accept(MediaType.APPLICATION_JSON))

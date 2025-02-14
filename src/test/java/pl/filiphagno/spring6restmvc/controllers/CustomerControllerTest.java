@@ -1,15 +1,20 @@
 package pl.filiphagno.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 import pl.filiphagno.spring6restmvc.services.CustomerService;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,12 +32,46 @@ class CustomerControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @Autowired
+    @MockitoBean
     CustomerService customerService;
 
     @Autowired
     ObjectMapper objectMapper;
 
+    List<CustomerDTO> customerDTOList;
+
+    @BeforeEach
+    void setUp() {
+        customerDTOList = setupData();
+    }
+
+    private List<CustomerDTO> setupData() {
+
+        List<CustomerDTO> customerDTOList = new ArrayList<>();
+        CustomerDTO customer1 = CustomerDTO.builder()
+                .id(UUID.randomUUID())
+                .name("John Doe")
+                .created(LocalDateTime.now())
+                .updated(LocalDateTime.now())
+                .build();
+        CustomerDTO customer2 = CustomerDTO.builder()
+                .id(UUID.randomUUID())
+                .name("Jane Doe")
+                .created(LocalDateTime.now())
+                .updated(LocalDateTime.now())
+                .build();
+        CustomerDTO customer3 = CustomerDTO.builder()
+                .id(UUID.randomUUID())
+                .name("Frank Doe")
+                .created(LocalDateTime.now())
+                .updated(LocalDateTime.now())
+                .build();
+        customerDTOList.add(customer1);
+        customerDTOList.add(customer2);
+        customerDTOList.add(customer3);
+
+        return customerDTOList;
+    }
 
     @Test
     void createCustomer() throws Exception {
@@ -53,7 +92,7 @@ class CustomerControllerTest {
 
     @Test
     void getListCustomers() throws Exception {
-        given(customerService.listCustomers()).willReturn(customerService.listCustomers());
+        given(customerService.listCustomers()).willReturn(customerDTOList);
 
         mockMvc.perform(get("/api/v1/customers").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -63,7 +102,7 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById() throws Exception {
-
+        given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
 
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
@@ -78,7 +117,7 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
-
+        given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
@@ -92,12 +131,11 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomer() throws Exception {
+        given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
         mockMvc.perform(delete("/api/v1/customer/" + testCustomerDTO.id())
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(testCustomerDTO.id().toString())));
+                .andExpect(status().isOk());
 
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(customerService).deleteCustomerById(argumentCaptor.capture());

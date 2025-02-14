@@ -1,6 +1,7 @@
 package pl.filiphagno.spring6restmvc.services;
 
 import org.springframework.stereotype.Service;
+import pl.filiphagno.spring6restmvc.entities.Customer;
 import pl.filiphagno.spring6restmvc.mappers.CustomerMapper;
 import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 import pl.filiphagno.spring6restmvc.repositories.CustomerRepository;
@@ -24,17 +25,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO addCustomer(CustomerDTO customerDTO) {
-
-        CustomerDTO newCustomerDTO = CustomerDTO.builder()
-                .id(UUID.randomUUID())
-                .created(LocalDateTime.now())
-                .updated(LocalDateTime.now())
-                .name(customerDTO.name())
-                .version(customerDTO.version())
-                .build();
-        customers.put(newCustomerDTO.id(), newCustomerDTO);
-
-        return newCustomerDTO;
+        Customer savedCustomer = customerRepository
+                .save(customerMapper.customerDtoToCustomer(customerDTO));
+        return customerMapper.customerToCustomerDTO(savedCustomer);
     }
 
     @Override
@@ -68,4 +61,6 @@ public class CustomerServiceImpl implements CustomerService {
     public void deleteCustomerById(UUID id) {
          customerRepository.deleteById(id);
     }
+
+
 }
