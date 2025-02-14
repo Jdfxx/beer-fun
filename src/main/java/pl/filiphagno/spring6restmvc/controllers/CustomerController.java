@@ -33,16 +33,14 @@ public class CustomerController {
         return customerService.listCustomers();
     }
 
-    @RequestMapping(value = "/customer/{id}")
+    @GetMapping(value = "/customer/{id}")
     public CustomerDTO getCustomerById(@PathVariable("id") UUID id) {
         return customerService.getCustomersById(id).orElseThrow(NotFoundException::new);
     }
 
     @PutMapping("/customer/{id}")
-    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable("id") UUID id, @RequestBody CustomerDTO customerDTO) {
-        customerService.getCustomersById(id).orElseThrow(NotFoundException::new);
-        customerService.updateCustomer(id, customerDTO);
-        return ResponseEntity.ok().build();
+    public CustomerDTO updateCustomer(@PathVariable("id") UUID id, @RequestBody CustomerDTO customerDTO) {
+        return customerService.updateCustomer(id, customerDTO).orElseThrow(NotFoundException::new);
     }
 
     @DeleteMapping("customer/{id}")

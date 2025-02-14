@@ -72,4 +72,34 @@ public class BeerControllerIntegrationTest {
         Beer savedBeer = beerRepository.findById(beerId).get();
         assertThat(savedBeer).isNotNull();
     }
+
+    @Transactional
+    @Rollback
+    @Test
+    void testUpdateBeerExists()  {
+        Beer beer = beerRepository.findAll().get(0);
+
+        BeerDTO beerDTO = BeerDTO.builder()
+                .beerStyle(beer.getBeerStyle())
+                .upc(beer.getUpc())
+                .quantityOnHand(beer.getQuantityOnHand())
+                .createdDate(beer.getCreatedDate())
+                .beerName("UPDATED")
+                .build();
+        beerController.updateBeer(beer.getId(), beerDTO);
+
+        Beer updatedBeer = beerRepository.findById(beer.getId()).get();
+        assertThat(updatedBeer).isNotNull();
+        assertThat(updatedBeer.getBeerStyle()).isEqualTo(beer.getBeerStyle());
+        assertThat(updatedBeer.getQuantityOnHand()).isEqualTo(beer.getQuantityOnHand());
+        assertThat(updatedBeer.getCreatedDate()).isEqualTo(beer.getCreatedDate());
+        assertThat(updatedBeer.getUpc()).isEqualTo(beer.getUpc());
+        assertThat(updatedBeer.getBeerName()).isEqualTo("UPDATED");
+    }
+
+    @Test
+    void testUpdateBeerNotExists() {
+        assertThrows(NotFoundException.class,
+                () -> beerController.updateBeer(UUID.randomUUID(), null));
+    }
 }

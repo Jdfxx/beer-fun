@@ -40,11 +40,8 @@ public class BeerController {
     }
 
     @PutMapping("/beer/{id}")
-    public ResponseEntity<String> updateBeer(@PathVariable("id") UUID id, @RequestBody BeerDTO beerDTO) {
-        log.debug("Controller: Got beer by id {} to be updated", id);
-        beerService.getBeerById(id).orElseThrow(NotFoundException::new);
-        beerService.updateBeer(id, beerDTO);
-        return ResponseEntity.ok().build();
+    public BeerDTO updateBeer(@PathVariable("id") UUID id, @RequestBody BeerDTO beerDTO) {
+        return beerService.updateBeer(id, beerDTO).orElseThrow(NotFoundException::new);
     }
 
     @DeleteMapping("beer/{id}")

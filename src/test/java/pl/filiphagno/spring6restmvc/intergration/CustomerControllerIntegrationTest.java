@@ -71,4 +71,24 @@ public class CustomerControllerIntegrationTest {
         Customer savedBeer = customerRepository.findById(customerId).get();
         assertThat(savedBeer).isNotNull();
     }
+
+    @Transactional
+    @Rollback
+    @Test
+    void testUpdateCustomerExists()  {
+        Customer customer = customerRepository.findAll().get(0);
+        CustomerDTO customerDTO = CustomerDTO.builder()
+                .name("UPDATED")
+                .build();
+        customerController.updateCustomer(customer.getId(), customerDTO);
+        Customer updatedCustomer = customerRepository.findById(customer.getId()).get();
+        assertThat(updatedCustomer).isNotNull();
+        assertThat(updatedCustomer.getName()).isEqualTo("UPDATED");
+    }
+
+    @Test
+    void testUpdateBeerNotExists() {
+        assertThrows(NotFoundException.class,
+                () -> customerController.updateCustomer(UUID.randomUUID(), null));
+    }
 }

@@ -10,6 +10,7 @@ import pl.filiphagno.spring6restmvc.repositories.BeerRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,8 +39,17 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public void updateBeer(UUID id, BeerDTO beerDTO) {
+    public Optional<BeerDTO> updateBeer(UUID id, BeerDTO beerDTO) {
+        AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
 
+        beerRepository.findById(id).ifPresentOrElse(beer -> {
+            beer.setBeerName(beerDTO.beerName());
+            beer.setBeerStyle(beerDTO.beerStyle());
+            beer.setUpc(beerDTO.upc());
+            beer.setPrice(beerDTO.price());
+            atomicReference.set(Optional.of(beerMapper.beerToBeerDTO(beerRepository.save(beer))));
+        }, () -> atomicReference.set(Optional.empty()));
+        return atomicReference.get();
     }
 
     @Override

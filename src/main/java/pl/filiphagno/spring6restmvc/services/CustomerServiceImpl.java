@@ -6,8 +6,8 @@ import pl.filiphagno.spring6restmvc.mappers.CustomerMapper;
 import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 import pl.filiphagno.spring6restmvc.repositories.CustomerRepository;
 
-import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,16 +45,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomer(UUID id, CustomerDTO customerDTO) {
-        CustomerDTO oldCustomerDTO = customers.get(id);
-        CustomerDTO newCustomerDTO = CustomerDTO.builder()
-                .id(oldCustomerDTO.id())
-                .name(customerDTO.name())
-                .created(oldCustomerDTO.created())
-                .updated(LocalDateTime.now())
-                .version(oldCustomerDTO.version() + 1)
-                .build();
-        customers.put(id, newCustomerDTO);
+    public Optional<CustomerDTO> updateCustomer(UUID id, CustomerDTO customerDTO) {
+        AtomicReference<Optional<CustomerDTO>> atomicReference = new AtomicReference<>();
+
+        customerRepository.findById(id).ifPresentOrElse( existingCustomer -> {
+            existingCustomer.setName(customerDTO.name());
+            atomicReference.set(Optional.of(
+                    customerMapper.customerToCustomerDTO(
+                            customerRepository.save(existingCustomer))));
+        }, ()-> atomicReference.set(Optional.empty()));
+        return atomicReference.get();
     }
 
     @Override
