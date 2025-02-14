@@ -15,6 +15,7 @@ import pl.filiphagno.spring6restmvc.repositories.BeerRepository;
 
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -42,9 +43,9 @@ public class BeerControllerIntegrationTest {
     }
 
     @Test
-    void testGetBeerById() {
+    void testGetBeerBy() {
         Beer beer = beerRepository.findAll().get(0);
-        BeerDTO beerDTO = beerController.getBeerById(beer.getId());
+        BeerDTO beerDTO = beerController.getBeerBy(beer.getId());
 
         assertThat(beerDTO).isNotNull();
     }
@@ -52,7 +53,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void testGetByIdNotFound() {
         assertThrows(NotFoundException.class,
-                () -> beerController.getBeerById(UUID.randomUUID()));
+                () -> beerController.getBeerBy(UUID.randomUUID()));
     }
 
     @Transactional
@@ -101,5 +102,23 @@ public class BeerControllerIntegrationTest {
     void testUpdateBeerNotExists() {
         assertThrows(NotFoundException.class,
                 () -> beerController.updateBeer(UUID.randomUUID(), null));
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void testDeleteCustomerExists() {
+        Beer Beer = beerRepository.findAll().get(0);
+
+        beerController.deleteBeerBy(Beer.getId());
+
+        Optional<Beer> deletedCustomer = beerRepository.findById(Beer.getId());
+        assertThat(deletedCustomer).isEmpty();
+    }
+
+    @Test
+    void testDeleteCustomerNotExists() {
+        assertThrows(NotFoundException.class,
+                () -> beerController.deleteBeerBy(UUID.randomUUID()));
     }
 }

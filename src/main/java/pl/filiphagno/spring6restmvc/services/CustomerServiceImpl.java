@@ -48,19 +48,24 @@ public class CustomerServiceImpl implements CustomerService {
     public Optional<CustomerDTO> updateCustomer(UUID id, CustomerDTO customerDTO) {
         AtomicReference<Optional<CustomerDTO>> atomicReference = new AtomicReference<>();
 
-        customerRepository.findById(id).ifPresentOrElse( existingCustomer -> {
+        customerRepository.findById(id).ifPresentOrElse(existingCustomer -> {
             existingCustomer.setName(customerDTO.name());
             atomicReference.set(Optional.of(
                     customerMapper.customerToCustomerDTO(
                             customerRepository.save(existingCustomer))));
-        }, ()-> atomicReference.set(Optional.empty()));
+        }, () -> atomicReference.set(Optional.empty()));
         return atomicReference.get();
     }
 
     @Override
-    public void deleteCustomerById(UUID id) {
-         customerRepository.deleteById(id);
+    public Optional<CustomerDTO> deleteCustomerById(UUID id) {
+        AtomicReference<Optional<CustomerDTO>> atomicReference = new AtomicReference<>();
+        customerRepository.findById(id).ifPresentOrElse(
+                existingCustomer -> {
+                    customerRepository.delete(existingCustomer);
+                    atomicReference.set(Optional.of(customerMapper.customerToCustomerDTO(existingCustomer)));
+                }
+                , () -> atomicReference.set(Optional.empty()));
+        return atomicReference.get();
     }
-
-
 }

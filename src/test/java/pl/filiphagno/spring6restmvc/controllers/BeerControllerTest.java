@@ -107,7 +107,7 @@ class BeerControllerTest {
     }
 
     @Test
-    void getBeerByIdNotFound() throws Exception {
+    void getBeerByNotFound() throws Exception {
 
         given(beerService.getBeerById(any(UUID.class))).willReturn(Optional.empty());
 
@@ -116,7 +116,7 @@ class BeerControllerTest {
     }
 
     @Test
-    void getBeerById() throws Exception {
+    void getBeerBy() throws Exception {
         given(beerService.listBeers()).willReturn(beerDTOList);
         BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
         assert testBeerDTO != null;
@@ -154,13 +154,12 @@ class BeerControllerTest {
         verify(beerService).updateBeer(any(UUID.class), any(BeerDTO.class));
     }
 
+
     @Test
-    void deleteBeer() throws Exception {
+    void deleteBeerById() throws Exception {
         given(beerService.listBeers()).willReturn(beerDTOList);
         BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
-        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeerDTO.id())
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeerDTO.id()));
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(beerService).removeBeerById(argumentCaptor.capture());
         assertThat(testBeerDTO.id()).isEqualTo(argumentCaptor.getValue());

@@ -28,7 +28,7 @@ public class BeerController {
     }
 
     @GetMapping(value = "/beer/{beerId}")
-    public BeerDTO getBeerById(@PathVariable("beerId") UUID beerId) {
+    public BeerDTO getBeerBy(@PathVariable("beerId") UUID beerId) {
         log.debug("Controller: Got beer by id {}", beerId);
         return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
@@ -45,8 +45,7 @@ public class BeerController {
     }
 
     @DeleteMapping("beer/{id}")
-    public ResponseEntity<String> deleteBeer(@PathVariable("id") UUID id) {
-        beerService.removeBeerById(id);
-        return ResponseEntity.ok().build();
+    public BeerDTO deleteBeerBy(@PathVariable("id") UUID id) {
+        return beerService.removeBeerById(id).orElseThrow(NotFoundException::new);
     }
 }

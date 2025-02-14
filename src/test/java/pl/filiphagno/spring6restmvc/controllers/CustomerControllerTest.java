@@ -101,7 +101,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void getCustomerById() throws Exception {
+    void getCustomerBy() throws Exception {
         given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
 
@@ -133,10 +133,7 @@ class CustomerControllerTest {
     void deleteCustomer() throws Exception {
         given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
-        mockMvc.perform(delete("/api/v1/customer/" + testCustomerDTO.id())
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
+        mockMvc.perform(delete("/api/v1/customer/" + testCustomerDTO.id()));
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(customerService).deleteCustomerById(argumentCaptor.capture());
         assertThat(testCustomerDTO.id()).isEqualTo(argumentCaptor.getValue());

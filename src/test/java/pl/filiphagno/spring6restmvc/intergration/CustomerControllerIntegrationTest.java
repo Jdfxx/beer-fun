@@ -14,6 +14,7 @@ import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 import pl.filiphagno.spring6restmvc.repositories.CustomerRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -42,16 +43,16 @@ public class CustomerControllerIntegrationTest {
     }
 
     @Test
-    void getCustomerByIdExist() {
+    void getCustomerByExist() {
         Customer customer = customerRepository.findAll().getFirst();
-        CustomerDTO customerDTO = customerController.getCustomerById(customer.getId());
+        CustomerDTO customerDTO = customerController.getCustomerBy(customer.getId());
         assertThat(customerDTO).isNotNull();
     }
 
     @Test
-    void getCustomerByIdNotFound() {
+    void getCustomerByNotFound() {
         assertThrows(NotFoundException.class,
-                ()-> customerController.getCustomerById(UUID.randomUUID()));
+                ()-> customerController.getCustomerBy(UUID.randomUUID()));
     }
 
     @Rollback
@@ -68,8 +69,8 @@ public class CustomerControllerIntegrationTest {
 
         String[] location = responseEntity.getHeaders().getLocation().getPath().split("/");
         UUID customerId = UUID.fromString(location[4]);
-        Customer savedBeer = customerRepository.findById(customerId).get();
-        assertThat(savedBeer).isNotNull();
+        Customer savedCustomer = customerRepository.findById(customerId).get();
+        assertThat(savedCustomer).isNotNull();
     }
 
     @Transactional
@@ -87,8 +88,26 @@ public class CustomerControllerIntegrationTest {
     }
 
     @Test
-    void testUpdateBeerNotExists() {
+    void testUpdateCustomerNotExists() {
         assertThrows(NotFoundException.class,
                 () -> customerController.updateCustomer(UUID.randomUUID(), null));
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void testDeleteCustomerExists() {
+        Customer customer = customerRepository.findAll().get(0);
+
+        customerController.deleteCustomerBy(customer.getId());
+
+        Optional<Customer> deletedCustomer = customerRepository.findById(customer.getId());
+        assertThat(deletedCustomer).isEmpty();
+    }
+
+    @Test
+    void testDeleteCustomerNotExists() {
+        assertThrows(NotFoundException.class,
+                () -> customerController.deleteCustomerBy(UUID.randomUUID()));
     }
 }

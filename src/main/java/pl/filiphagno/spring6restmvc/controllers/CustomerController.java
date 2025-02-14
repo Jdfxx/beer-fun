@@ -34,7 +34,7 @@ public class CustomerController {
     }
 
     @GetMapping(value = "/customer/{id}")
-    public CustomerDTO getCustomerById(@PathVariable("id") UUID id) {
+    public CustomerDTO getCustomerBy(@PathVariable("id") UUID id) {
         return customerService.getCustomersById(id).orElseThrow(NotFoundException::new);
     }
 
@@ -44,8 +44,8 @@ public class CustomerController {
     }
 
     @DeleteMapping("customer/{id}")
-    public ResponseEntity<CustomerDTO> deleteCustomerById(@PathVariable("id") UUID id) {
-        customerService.deleteCustomerById(id);
-        return ResponseEntity.ok().build();
+    public CustomerDTO deleteCustomerBy(@PathVariable("id") UUID id) {
+       return customerService.deleteCustomerById(id).orElseThrow(NotFoundException::new);
+
     }
 }

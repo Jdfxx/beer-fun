@@ -59,7 +59,15 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public void removeBeerById(UUID id) {
-        beerRepository.deleteById(id);
+    public Optional<BeerDTO> removeBeerById(UUID id) {
+        AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
+        beerRepository.findById(id).ifPresentOrElse(
+                existingBeer -> {
+                    beerRepository.delete(existingBeer);
+                    atomicReference.set(Optional.of(beerMapper.beerToBeerDTO(existingBeer)));
+                },
+                () -> atomicReference.set(Optional.empty())
+        );
+        return atomicReference.get();
     }
 }
