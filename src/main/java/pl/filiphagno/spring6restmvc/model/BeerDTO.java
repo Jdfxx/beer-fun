@@ -1,5 +1,7 @@
 package pl.filiphagno.spring6restmvc.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -10,11 +12,11 @@ import java.util.UUID;
 public record BeerDTO(
     UUID id,
     Integer version,
-    String beerName,
-    BeerStyle beerStyle,
-    String upc,
+    @NotBlank String beerName,
+    @NotNull BeerStyle beerStyle,
+    @NotBlank String upc,
     Integer quantityOnHand,
-    BigDecimal price,
+    @NotNull BigDecimal price,
     LocalDateTime createdDate,
     LocalDateTime updatedDate) {
 }

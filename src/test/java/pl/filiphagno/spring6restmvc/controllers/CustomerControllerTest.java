@@ -91,6 +91,22 @@ class CustomerControllerTest {
     }
 
     @Test
+    void createCustomerBadRequest() throws Exception {
+        CustomerDTO customerDTO = CustomerDTO.builder()
+                .id(UUID.randomUUID())
+                .name(null)
+                .build();
+        given(customerService.addCustomer(any(CustomerDTO.class))).willReturn(customerDTO);
+
+        mockMvc.perform(post("/api/v1/customer")
+                        .content(objectMapper.writeValueAsString(customerDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
+
+    }
+
+    @Test
     void getListCustomers() throws Exception {
         given(customerService.listCustomers()).willReturn(customerDTOList);
 
@@ -127,6 +143,23 @@ class CustomerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         verify(customerService).updateCustomer(any(UUID.class), any(CustomerDTO.class));
+    }
+
+    @Test
+    void updateCustomerBadRequest() throws Exception {
+        given(customerService.listCustomers()).willReturn(customerDTOList);
+        CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
+        UUID id = testCustomerDTO.id();
+        testCustomerDTO = new CustomerDTO(id, null, null, null, null);
+        given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
+
+        mockMvc.perform(put("/api/v1/customer/" + testCustomerDTO.id())
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testCustomerDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
+
     }
 
     @Test

@@ -3,6 +3,7 @@ package pl.filiphagno.spring6restmvc.controllers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
 import pl.filiphagno.spring6restmvc.services.BeerService;
@@ -34,13 +35,13 @@ public class BeerController {
     }
 
     @PostMapping(value = "/beer")
-    public ResponseEntity<String> createBeer(@RequestBody BeerDTO beerDTO) throws URISyntaxException {
+    public ResponseEntity<String> createBeer(@Validated @RequestBody BeerDTO beerDTO) throws URISyntaxException {
         BeerDTO savedBeerDTO = beerService.addBeer(beerDTO);
         return ResponseEntity.created(new URI(BASE_URI +"/beer/" + savedBeerDTO.id())).build();
     }
 
     @PutMapping("/beer/{id}")
-    public BeerDTO updateBeer(@PathVariable("id") UUID id, @RequestBody BeerDTO beerDTO) {
+    public BeerDTO updateBeer(@PathVariable("id") UUID id, @Validated @RequestBody BeerDTO beerDTO) {
         return beerService.updateBeer(id, beerDTO).orElseThrow(NotFoundException::new);
     }
 

@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
 import pl.filiphagno.spring6restmvc.model.BeerStyle;
@@ -55,6 +56,7 @@ class BeerControllerTest {
                 .beerStyle(BeerStyle.PORTER)
                 .price(new BigDecimal("4.65"))
                 .quantityOnHand(12)
+                .upc("test")
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();
@@ -66,6 +68,7 @@ class BeerControllerTest {
                 .beerStyle(BeerStyle.PORTER)
                 .price(new BigDecimal("4.65"))
                 .quantityOnHand(12)
+                .upc("test")
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();
@@ -77,6 +80,7 @@ class BeerControllerTest {
                 .beerStyle(BeerStyle.PORTER)
                 .price(new BigDecimal("4.65"))
                 .quantityOnHand(12)
+                .upc("test")
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();
@@ -88,10 +92,30 @@ class BeerControllerTest {
     }
 
     @Test
+    void createBeerNoNme() throws Exception {
+        BeerDTO beerDTO = BeerDTO.builder()
+                .id(UUID.randomUUID())
+                .beerStyle(STOUT)
+                .beerName(null)
+                .quantityOnHand(200)
+                .build();
+
+        given(beerService.addBeer(any(BeerDTO.class))).willReturn(beerDTO);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI +"/beer")
+                        .content(objectMapper.writeValueAsString(beerDTO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(3)));
+    }
+
+    @Test
     void createBeer() throws Exception {
         BeerDTO beerDTO = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .beerStyle(STOUT)
+                .upc("test")
+                .beerName("Test name")
                 .quantityOnHand(200)
                 .price(BigDecimal.valueOf(12.5))
                 .build();
@@ -152,6 +176,23 @@ class BeerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         verify(beerService).updateBeer(any(UUID.class), any(BeerDTO.class));
+    }
+
+    @Test
+    void updateBeerWhenBeerBadRequest() throws Exception {
+        given(beerService.listBeers()).willReturn(beerDTOList);
+        BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
+        UUID id = testBeerDTO.id();
+        testBeerDTO = new BeerDTO(id, null, null,
+                null, null, null, null, null, null);
+        given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
+        mockMvc.perform(MockMvcRequestBuilders.put(BASE_URI + "/beer/" + testBeerDTO.id())
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testBeerDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(4)));
+
     }
 
 

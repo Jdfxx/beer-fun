@@ -2,6 +2,7 @@ package pl.filiphagno.spring6restmvc.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.filiphagno.spring6restmvc.model.CustomerDTO;
 import pl.filiphagno.spring6restmvc.services.CustomerService;
@@ -22,7 +23,7 @@ public class CustomerController {
     }
 
     @PostMapping("/customer")
-    public ResponseEntity<CustomerDTO> addCustomer(@RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<CustomerDTO> addCustomer(@Validated @RequestBody CustomerDTO customerDTO) {
         CustomerDTO newCustomerDTO = customerService.addCustomer(customerDTO);
         return ResponseEntity.created(URI.create("/api/v1/customer/" + newCustomerDTO.id()))
                 .build();
@@ -39,7 +40,7 @@ public class CustomerController {
     }
 
     @PutMapping("/customer/{id}")
-    public CustomerDTO updateCustomer(@PathVariable("id") UUID id, @RequestBody CustomerDTO customerDTO) {
+    public CustomerDTO updateCustomer(@PathVariable("id") UUID id, @Validated @RequestBody CustomerDTO customerDTO) {
         return customerService.updateCustomer(id, customerDTO).orElseThrow(NotFoundException::new);
     }
 
