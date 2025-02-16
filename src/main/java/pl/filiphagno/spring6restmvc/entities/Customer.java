@@ -1,6 +1,7 @@
 package pl.filiphagno.spring6restmvc.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -20,7 +21,9 @@ public class Customer {
     @UuidGenerator
     @Column(length = 36, columnDefinition = "varchar", updatable = false, nullable = false)
     UUID id;
+
     @Column
+    @NotNull
     String name;
 
     @Version

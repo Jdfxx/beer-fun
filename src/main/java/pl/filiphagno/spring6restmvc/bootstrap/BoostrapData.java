@@ -32,6 +32,7 @@ public class BoostrapData implements CommandLineRunner {
                     .beerStyle(BeerStyle.PORTER)
                     .price(new BigDecimal("4.65"))
                     .quantityOnHand(12)
+                    .upc("123456789")
                     .createdDate(LocalDateTime.now())
                     .updatedDate(LocalDateTime.now())
                     .build();
@@ -42,6 +43,7 @@ public class BoostrapData implements CommandLineRunner {
                     .beerStyle(BeerStyle.PORTER)
                     .price(new BigDecimal("4.65"))
                     .quantityOnHand(12)
+                    .upc("123456789")
                     .createdDate(LocalDateTime.now())
                     .updatedDate(LocalDateTime.now())
                     .build();
@@ -52,6 +54,7 @@ public class BoostrapData implements CommandLineRunner {
                     .beerStyle(BeerStyle.PORTER)
                     .price(new BigDecimal("4.65"))
                     .quantityOnHand(12)
+                    .upc("123456789")
                     .createdDate(LocalDateTime.now())
                     .updatedDate(LocalDateTime.now())
                     .build();
