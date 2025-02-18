@@ -150,7 +150,7 @@ class CustomerControllerTest {
         given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
         UUID id = testCustomerDTO.id();
-        testCustomerDTO = new CustomerDTO(id, null, null, null, null);
+        testCustomerDTO = new CustomerDTO(id, null, null, null,null, null);
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomerDTO.id())
