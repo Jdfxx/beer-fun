@@ -9,6 +9,7 @@ import java.util.UUID;
 @Builder
 public record CustomerDTO(UUID id,
                           @NotBlank String name,
+                          String email,
                           Integer version,
                           LocalDateTime created,
                           LocalDateTime updated) {

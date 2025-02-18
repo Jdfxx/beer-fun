@@ -1,6 +1,7 @@
 package pl.filiphagno.spring6restmvc.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -28,6 +29,9 @@ public class Customer {
     @Column
     @NotNull
     String name;
+
+    @Column(length = 255)
+    String email;
 
     @Version
     @Column

@@ -26,6 +26,8 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
     def mapStructVersion = "1.5.2.Final"
 
     implementation "org.mapstruct:mapstruct:$mapStructVersion"

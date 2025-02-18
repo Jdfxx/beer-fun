@@ -37,6 +37,7 @@ public class Beer {
     @Size(max = 50)
     String beerName;
     @NotNull
+    @JdbcTypeCode(value = SqlTypes.SMALLINT)
     BeerStyle beerStyle;
     @NotBlank
     String upc;
