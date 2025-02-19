@@ -33,7 +33,6 @@ public class MySQLTestIT {
     @Autowired
     BeerRepository beerRepository;
 
-
     @Test
     void listBeers() {
         List<Beer> beers = beerRepository.findAll();

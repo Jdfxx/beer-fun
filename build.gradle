@@ -33,6 +33,7 @@ dependencies {
     testImplementation 'org.testcontainers:mysql'
     def mapStructVersion = "1.5.2.Final"
 
+    implementation 'com.opencsv:opencsv:5.10'
     implementation "org.mapstruct:mapstruct:$mapStructVersion"
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
