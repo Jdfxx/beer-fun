@@ -6,15 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.filiphagno.spring6restmvc.controllers.BeerController;
 import pl.filiphagno.spring6restmvc.controllers.NotFoundException;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
+import pl.filiphagno.spring6restmvc.model.BeerStyle;
 import pl.filiphagno.spring6restmvc.repositories.BeerRepository;
 
 import java.net.URISyntaxException;
@@ -23,7 +26,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
 
 @SpringBootTest
 public class BeerControllerIntegrationTest {
@@ -44,7 +50,7 @@ public class BeerControllerIntegrationTest {
 
     @Test
     void testListBeers() {
-        List<BeerDTO> beers = beerController.listBeers();
+        List<BeerDTO> beers = beerController.listBeers(null, null);
         assertThat(beers.size()).isEqualTo(2413);
     }
 
@@ -52,7 +58,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void testEmptyListBeers() {
         beerRepository.deleteAll();
-        List<BeerDTO> beers = beerController.listBeers();
+        List<BeerDTO> beers = beerController.listBeers(null, null);
         assertThat(beers.size()).isEqualTo(0);
     }
 
@@ -134,5 +140,23 @@ public class BeerControllerIntegrationTest {
     void testDeleteCustomerNotExists() {
         assertThrows(NotFoundException.class,
                 () -> beerController.deleteBeerBy(UUID.randomUUID()));
+    }
+
+    @Test
+    void listBeersByName() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
+                        .queryParam("beerName", "IPA"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()", is(336)));
+    }
+
+    @Test
+    void listBeersByStyle() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
+                        .queryParam("beerStyle", BeerStyle.PORTER.name()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()", is(71)));
     }
 }

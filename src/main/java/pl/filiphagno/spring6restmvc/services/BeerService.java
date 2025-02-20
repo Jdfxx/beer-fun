@@ -1,6 +1,7 @@
 package pl.filiphagno.spring6restmvc.services;
 
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
+import pl.filiphagno.spring6restmvc.model.BeerStyle;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +10,7 @@ import java.util.UUID;
 public interface BeerService {
     Optional<BeerDTO> getBeerById(UUID id);
 
-    List<BeerDTO> listBeers();
+    List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle);
 
     BeerDTO addBeer(BeerDTO beerDTO);
 

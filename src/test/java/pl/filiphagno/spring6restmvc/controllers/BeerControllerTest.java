@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
 import pl.filiphagno.spring6restmvc.model.BeerStyle;
@@ -141,8 +140,8 @@ class BeerControllerTest {
 
     @Test
     void getBeerBy() throws Exception {
-        given(beerService.listBeers()).willReturn(beerDTOList);
-        BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
+        given(beerService.listBeers(null, null)).willReturn(beerDTOList);
+        BeerDTO testBeerDTO = beerService.listBeers(null, null).stream().findFirst().orElse(null);
         assert testBeerDTO != null;
         given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
 
@@ -156,7 +155,7 @@ class BeerControllerTest {
 
     @Test
     void getListBeers() throws Exception {
-        given(beerService.listBeers()).willReturn(beerDTOList);
+        given(beerService.listBeers(null, null)).willReturn(beerDTOList);
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -166,8 +165,8 @@ class BeerControllerTest {
 
     @Test
     void updateBeerWhenBeerExist() throws Exception {
-        given(beerService.listBeers()).willReturn(beerDTOList);
-        BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
+        given(beerService.listBeers(null, null)).willReturn(beerDTOList);
+        BeerDTO testBeerDTO = beerService.listBeers(null, null).stream().findFirst().orElse(null);
         assert testBeerDTO != null;
         given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
         mockMvc.perform(MockMvcRequestBuilders.put(BASE_URI + "/beer/" + testBeerDTO.id())
@@ -180,8 +179,8 @@ class BeerControllerTest {
 
     @Test
     void updateBeerWhenBeerBadRequest() throws Exception {
-        given(beerService.listBeers()).willReturn(beerDTOList);
-        BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
+        given(beerService.listBeers(null, null)).willReturn(beerDTOList);
+        BeerDTO testBeerDTO = beerService.listBeers(null, null).stream().findFirst().orElse(null);
         UUID id = testBeerDTO.id();
         testBeerDTO = new BeerDTO(id, null, null,
                 null, null, null, null, null, null);
@@ -198,11 +197,12 @@ class BeerControllerTest {
 
     @Test
     void deleteBeerById() throws Exception {
-        given(beerService.listBeers()).willReturn(beerDTOList);
-        BeerDTO testBeerDTO = beerService.listBeers().stream().findFirst().orElse(null);
+        given(beerService.listBeers(null, null)).willReturn(beerDTOList);
+        BeerDTO testBeerDTO = beerService.listBeers(null, null).stream().findFirst().orElse(null);
         mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeerDTO.id()));
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(beerService).removeBeerById(argumentCaptor.capture());
         assertThat(testBeerDTO.id()).isEqualTo(argumentCaptor.getValue());
     }
+
 }

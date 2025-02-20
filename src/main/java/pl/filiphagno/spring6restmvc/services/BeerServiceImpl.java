@@ -2,11 +2,14 @@ package pl.filiphagno.spring6restmvc.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.mappers.BeerMapper;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
+import pl.filiphagno.spring6restmvc.model.BeerStyle;
 import pl.filiphagno.spring6restmvc.repositories.BeerRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,10 +29,26 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public List<BeerDTO> listBeers() {
-        return beerRepository.findAll().stream()
-                .map(beerMapper::beerToBeerDTO)
-                .collect(Collectors.toList());
+    public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle) {
+        List<Beer> beerList;
+
+        if (StringUtils.hasText(beerName)) {
+            beerList = listBeersByName(beerName);
+        } else if (beerStyle != null) {
+            beerList = listBeersByStyle(beerStyle);
+        }else {
+            beerList = beerRepository.findAll();
+        }
+
+        return beerList.stream().map(beerMapper::beerToBeerDTO).collect(Collectors.toList());
+    }
+
+    private List<Beer> listBeersByStyle(BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerStyle(beerStyle);
+    }
+
+    private List<Beer> listBeersByName(String beerName) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%");
     }
 
     @Override
