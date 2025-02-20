@@ -5,9 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import pl.filiphagno.spring6restmvc.bootstrap.BoostrapData;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.model.BeerStyle;
+import pl.filiphagno.spring6restmvc.services.BeerCsvService;
 
 import java.math.BigDecimal;
 
@@ -23,9 +25,12 @@ class BeerRepositoryTest {
 
     BoostrapData boostrapData;
 
+    @MockitoBean
+    private BeerCsvService beerCsvService;
+
     @BeforeEach
     void setUp() {
-        boostrapData = new BoostrapData(beerRepository, customerRepository);
+        boostrapData = new BoostrapData(beerRepository, customerRepository, beerCsvService);
     }
 
     @Test

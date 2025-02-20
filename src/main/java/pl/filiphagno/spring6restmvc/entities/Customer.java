@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
@@ -26,7 +28,6 @@ public class Customer {
     @Column(length = 36, columnDefinition = "varchar(36)", updatable = false, nullable = false)
     UUID id;
 
-    @Column
     @NotNull
     String name;
 
@@ -34,10 +35,9 @@ public class Customer {
     String email;
 
     @Version
-    @Column
     Integer version;
-    @Column
+    @CreationTimestamp
     LocalDateTime created;
-    @Column
+    @UpdateTimestamp
     LocalDateTime updated;
 }

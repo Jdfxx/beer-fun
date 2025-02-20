@@ -4,10 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.entities.Customer;
 import pl.filiphagno.spring6restmvc.repositories.BeerRepository;
 import pl.filiphagno.spring6restmvc.repositories.CustomerRepository;
+import pl.filiphagno.spring6restmvc.services.BeerCsvService;
 
 import java.util.List;
 
@@ -22,11 +24,15 @@ class BoostrapDataTest {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @MockitoBean
+    private BeerCsvService beerCsvService;
+
+
     BoostrapData boostrapData;
 
     @BeforeEach
     void setUp() {
-        boostrapData = new BoostrapData(beerRepository, customerRepository);
+        boostrapData = new BoostrapData(beerRepository, customerRepository, beerCsvService);
     }
 
     @Test
