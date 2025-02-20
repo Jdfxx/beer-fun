@@ -10,7 +10,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import pl.filiphagno.spring6restmvc.bootstrap.BoostrapData;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.model.BeerStyle;
-import pl.filiphagno.spring6restmvc.services.BeerCsvService;
 import pl.filiphagno.spring6restmvc.services.BeerCsvServiceImpl;
 
 import java.math.BigDecimal;

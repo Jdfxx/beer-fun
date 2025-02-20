@@ -16,6 +16,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @Slf4j
 @Service
 public class BeerServiceImpl implements BeerService {
@@ -29,18 +31,30 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle) {
+    public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory) {
         List<Beer> beerList;
 
-        if (StringUtils.hasText(beerName)) {
+        if (StringUtils.hasText(beerName) && beerStyle == null) {
             beerList = listBeersByName(beerName);
-        } else if (beerStyle != null) {
+        } else if (!StringUtils.hasText(beerName) && beerStyle != null) {
             beerList = listBeersByStyle(beerStyle);
-        }else {
+        } else if (StringUtils.hasText(beerName) && beerStyle != null) {
+            beerList = listBeersByNameAndStyle(beerName, beerStyle);
+        } else {
             beerList = beerRepository.findAll();
         }
 
+        if(Boolean.FALSE.equals(showInventory) || isNull(showInventory)) {
+            beerList.forEach(beer -> {
+                beer.setQuantityOnHand(null);
+            });
+        }
+
         return beerList.stream().map(beerMapper::beerToBeerDTO).collect(Collectors.toList());
+    }
+
+    private List<Beer> listBeersByNameAndStyle(String beerName, BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle("%" + beerName + "%", beerStyle);
     }
 
     private List<Beer> listBeersByStyle(BeerStyle beerStyle) {

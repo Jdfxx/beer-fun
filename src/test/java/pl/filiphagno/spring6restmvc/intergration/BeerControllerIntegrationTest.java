@@ -1,6 +1,7 @@
 package pl.filiphagno.spring6restmvc.intergration;
 
 import jakarta.transaction.Transactional;
+import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
 
@@ -50,7 +52,7 @@ public class BeerControllerIntegrationTest {
 
     @Test
     void testListBeers() {
-        List<BeerDTO> beers = beerController.listBeers(null, null);
+        List<BeerDTO> beers = beerController.listBeers(null, null, null);
         assertThat(beers.size()).isEqualTo(2413);
     }
 
@@ -58,7 +60,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void testEmptyListBeers() {
         beerRepository.deleteAll();
-        List<BeerDTO> beers = beerController.listBeers(null, null);
+        List<BeerDTO> beers = beerController.listBeers(null, null, null);
         assertThat(beers.size()).isEqualTo(0);
     }
 
@@ -144,7 +146,7 @@ public class BeerControllerIntegrationTest {
 
     @Test
     void listBeersByName() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
+        mockMvc.perform(get(BASE_URI + "/beers")
                         .queryParam("beerName", "IPA"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -153,10 +155,42 @@ public class BeerControllerIntegrationTest {
 
     @Test
     void listBeersByStyle() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
+        mockMvc.perform(get(BASE_URI + "/beers")
                         .queryParam("beerStyle", BeerStyle.PORTER.name()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.size()", is(71)));
+    }
+
+    @Test
+    void listBeersByNameAndStyle() throws Exception {
+        mockMvc.perform(get(BASE_URI + "/beers")
+                        .queryParam("beerStyle", BeerStyle.IPA.name())
+                        .queryParam("beerName", "IPA"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()", is(310)));
+    }
+
+    @Test
+    void tesListBeersByStyleAndNameShowInventoryTrue() throws Exception {
+        mockMvc.perform(get(BASE_URI + "/beers")
+                        .queryParam("beerName", "IPA")
+                        .queryParam("beerStyle", BeerStyle.IPA.name())
+                        .queryParam("showInventory", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(310)))
+                .andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.notNullValue()));
+    }
+
+    @Test
+    void tesListBeersByStyleAndNameShowInventoryFalse() throws Exception {
+        mockMvc.perform(get(BASE_URI + "/beers")
+                        .queryParam("beerName", "IPA")
+                        .queryParam("beerStyle", BeerStyle.IPA.name())
+                        .queryParam("showInventory", "false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(310)))
+                .andExpect(jsonPath("$.[0].quantityOnHand").value(IsNull.nullValue()));
     }
 }
