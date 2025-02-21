@@ -1,12 +1,11 @@
 package pl.filiphagno.spring6restmvc.repositories;
 
 import jakarta.validation.ConstraintViolationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.data.domain.Page;
 import pl.filiphagno.spring6restmvc.bootstrap.BoostrapData;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.model.BeerStyle;
@@ -26,14 +25,14 @@ class BeerRepositoryTest {
 
     @Test
     void getBeerListByName() {
-    List<Beer> listBeers = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%");
-    assertThat(listBeers.size()).isEqualTo(336);
+    Page<Beer> listBeers = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%", null);
+    assertThat(listBeers.stream().count()).isEqualTo(336);
     }
 
     @Test
     void getBeerListByBeerStyle() {
-        List<Beer> listBeers = beerRepository.findAllByBeerStyle(BeerStyle.PORTER);
-        assertThat(listBeers.size()).isEqualTo(71);
+        Page<Beer> listBeers = beerRepository.findAllByBeerStyle(BeerStyle.PORTER, null);
+        assertThat(listBeers.stream().count()).isEqualTo(71);
     }
 
     @Test
