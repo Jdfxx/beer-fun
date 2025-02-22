@@ -14,6 +14,7 @@ import pl.filiphagno.spring6restmvc.model.BeerStyle;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -50,4 +51,8 @@ public class Beer {
     LocalDateTime createdDate;
     @UpdateTimestamp
     LocalDateTime updatedDate;
+
+    @OneToMany(mappedBy = "beer")
+    private Set<BeerOrderLine> beerOrderLines;
+
 }
