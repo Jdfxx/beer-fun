@@ -14,6 +14,7 @@ import pl.filiphagno.spring6restmvc.model.BeerStyle;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -54,5 +55,11 @@ public class Beer {
 
     @OneToMany(mappedBy = "beer")
     private Set<BeerOrderLine> beerOrderLines;
+
+    @ManyToMany
+    @JoinTable(name = "beer_category",
+            joinColumns = @JoinColumn(name="beer_id"),
+    inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories;
 
 }

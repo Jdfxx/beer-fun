@@ -12,7 +12,6 @@ import pl.filiphagno.spring6restmvc.model.BeerStyle;
 import pl.filiphagno.spring6restmvc.services.BeerCsvServiceImpl;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
