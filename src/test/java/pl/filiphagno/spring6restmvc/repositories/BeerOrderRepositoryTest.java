@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.entities.BeerOrder;
+import pl.filiphagno.spring6restmvc.entities.BeerOrderShipment;
 import pl.filiphagno.spring6restmvc.entities.Customer;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class BeerOrderRepositoryTest {
@@ -36,6 +36,9 @@ class BeerOrderRepositoryTest {
     void testBeerOrders() {
         BeerOrder beerOrder = BeerOrder.builder()
                 .customerRef("Test order")
+                .beerOrderShipment(BeerOrderShipment.builder()
+                        .trackingNumber("testTrackingNumber")
+                        .build())
                 .customer(testCustomer)
                 .build();
         BeerOrder savedBeerOrder = beerOrderRepository.save(beerOrder);
