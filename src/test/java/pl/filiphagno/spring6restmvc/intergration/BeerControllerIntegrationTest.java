@@ -12,10 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.filiphagno.spring6restmvc.controllers.BeerController;
+import pl.filiphagno.spring6restmvc.controllers.BeerControllerTest;
 import pl.filiphagno.spring6restmvc.controllers.NotFoundException;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
@@ -23,16 +23,18 @@ import pl.filiphagno.spring6restmvc.model.BeerStyle;
 import pl.filiphagno.spring6restmvc.repositories.BeerRepository;
 
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
+import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.USERNAME;
 
 @SpringBootTest
 public class BeerControllerIntegrationTest {
@@ -48,7 +50,9 @@ public class BeerControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
@@ -148,17 +152,19 @@ public class BeerControllerIntegrationTest {
 
     @Test
     void listBeersByName() throws Exception {
-       mockMvc.perform(get(BASE_URI + "/beers")
-                       .queryParam("beerName", "IPA")
-                       .queryParam("pageSize", "500"))
+        mockMvc.perform(get(BASE_URI + "/beers")
+                .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
+                        .queryParam("beerName", "IPA")
+                        .queryParam("pageSize", "500"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()", is(336)));
-   }
+    }
 
     @Test
     void listBeersByStyle() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
+                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
                         .queryParam("beerStyle", BeerStyle.PORTER.name())
                         .queryParam("pageSize", "500"))
                 .andExpect(status().isOk())
@@ -169,6 +175,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByNameAndStyle() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
+                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("beerName", "IPA")
                         .queryParam("pageSize", "500"))
@@ -183,7 +190,8 @@ public class BeerControllerIntegrationTest {
                         .queryParam("beerName", "IPA")
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("showInventory", "true")
-                        .queryParam("pageSize", "500"))
+                        .queryParam("pageSize", "500")
+                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()", is(310)))
                 .andExpect(jsonPath("$.content[0].quantityOnHand").value(IsNull.notNullValue()));
@@ -192,6 +200,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByStyleAndNameShowInventoryFalse() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
+                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
                         .queryParam("beerName", "IPA")
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("showInventory", "false")
@@ -204,6 +213,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByStyleAndNameShowInventoryTruePage2() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
+                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
                         .queryParam("beerName", "IPA")
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("showInventory", "true")
@@ -212,4 +222,12 @@ public class BeerControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size", is(50)));
     }
+
+    @Test
+    void authFailsWithWrongPassword() throws Exception {
+        mockMvc.perform(get(BASE_URI + "/beers")
+                        .with(httpBasic("some", BeerControllerTest.PASSWORD)))
+                .andExpect(status().isUnauthorized());
+    }
+
 }

@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.filiphagno.spring6restmvc.model.CustomerDTO;
+import pl.filiphagno.spring6restmvc.security.SpringSecurityConfig;
 import pl.filiphagno.spring6restmvc.services.CustomerService;
 
 import java.time.LocalDateTime;
@@ -23,10 +25,14 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.PASSWORD;
+import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.USERNAME;
 
 @WebMvcTest(CustomerController.class)
+@Import(SpringSecurityConfig.class)
 class CustomerControllerTest {
 
     @Autowired
@@ -83,6 +89,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(post("/api/v1/customer")
             .content(objectMapper.writeValueAsString(customerDTO))
+            .with(httpBasic(USERNAME, PASSWORD))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andExpect(header().exists("Location"))
@@ -100,6 +107,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(post("/api/v1/customer")
                         .content(objectMapper.writeValueAsString(customerDTO))
+                        .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.length()", is(1)));
@@ -110,7 +118,8 @@ class CustomerControllerTest {
     void getListCustomers() throws Exception {
         given(customerService.listCustomers()).willReturn(customerDTOList);
 
-        mockMvc.perform(get("/api/v1/customers").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/customers").accept(MediaType.APPLICATION_JSON)
+                .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()", is(3)));
@@ -124,6 +133,7 @@ class CustomerControllerTest {
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
         mockMvc.perform(get("/api/v1/customer/" + UUID.randomUUID())
+                .with(httpBasic(USERNAME, PASSWORD))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -138,6 +148,7 @@ class CustomerControllerTest {
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomerDTO.id())
+                .with(httpBasic(USERNAME, PASSWORD))
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testCustomerDTO))
                 .contentType(MediaType.APPLICATION_JSON));
@@ -155,6 +166,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomerDTO.id())
                 .accept(MediaType.APPLICATION_JSON)
+                .with(httpBasic(USERNAME, PASSWORD))
                 .content(objectMapper.writeValueAsString(testCustomerDTO))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -166,7 +178,8 @@ class CustomerControllerTest {
     void deleteCustomer() throws Exception {
         given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
-        mockMvc.perform(delete("/api/v1/customer/" + testCustomerDTO.id()));
+        mockMvc.perform(delete("/api/v1/customer/" + testCustomerDTO.id())
+                .with(httpBasic(USERNAME, PASSWORD)));
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(customerService).deleteCustomerById(argumentCaptor.capture());
         assertThat(testCustomerDTO.id()).isEqualTo(argumentCaptor.getValue());

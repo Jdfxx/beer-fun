@@ -4,35 +4,42 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
 import pl.filiphagno.spring6restmvc.model.BeerStyle;
+import pl.filiphagno.spring6restmvc.security.SpringSecurityConfig;
 import pl.filiphagno.spring6restmvc.services.BeerService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
 import static pl.filiphagno.spring6restmvc.model.BeerStyle.STOUT;
 
 @WebMvcTest(controllers = BeerController.class)
-class BeerControllerTest {
+@Import(SpringSecurityConfig.class)
+public class BeerControllerTest {
+
+    public static final String USERNAME = "user1";
+    public static final String PASSWORD = "password";
     @Autowired
     MockMvc mockMvc;
 
@@ -100,6 +107,7 @@ class BeerControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI +"/beer")
                         .content(objectMapper.writeValueAsString(beerDTO))
+                        .with(httpBasic(USERNAME, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.length()", is(3)));
@@ -120,6 +128,7 @@ class BeerControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI +"/beer")
                     .content(objectMapper.writeValueAsString(beerDTO))
+                    .with(httpBasic(USERNAME, PASSWORD))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
@@ -131,7 +140,8 @@ class BeerControllerTest {
 
         given(beerService.getBeerById(any(UUID.class))).willReturn(Optional.empty());
 
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beer/" + UUID.randomUUID()))
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beer/" + UUID.randomUUID())
+                .with(httpBasic(USERNAME, PASSWORD)))
                 .andExpect(status().isNotFound());
     }
 
@@ -143,6 +153,7 @@ class BeerControllerTest {
         given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI +"/beer/" + testBeerDTO.id())
+                        .with(httpBasic(USERNAME, PASSWORD))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -154,6 +165,7 @@ class BeerControllerTest {
     void getListBeers() throws Exception {
         given(beerService.listBeers(any(), any(), any(), any(), any())).willReturn(beerDTOList);
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/beers")
+                        .with(httpBasic(USERNAME, PASSWORD))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -168,6 +180,7 @@ class BeerControllerTest {
         given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
         mockMvc.perform(MockMvcRequestBuilders.put(BASE_URI + "/beer/" + testBeerDTO.id())
                 .accept(MediaType.APPLICATION_JSON)
+                .with(httpBasic(USERNAME, PASSWORD))
                 .content(objectMapper.writeValueAsString(testBeerDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -184,6 +197,7 @@ class BeerControllerTest {
         given(beerService.getBeerById(testBeerDTO.id())).willReturn(Optional.of(testBeerDTO));
         mockMvc.perform(MockMvcRequestBuilders.put(BASE_URI + "/beer/" + testBeerDTO.id())
                 .accept(MediaType.APPLICATION_JSON)
+                        .with(httpBasic(USERNAME, PASSWORD))
                 .content(objectMapper.writeValueAsString(testBeerDTO))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -196,7 +210,8 @@ class BeerControllerTest {
     void deleteBeerById() throws Exception {
         given(beerService.listBeers(null, null, false, 1, 25)).willReturn(beerDTOList);
         BeerDTO testBeerDTO = beerService.listBeers(null, null, false, 1, 25).stream().findFirst().orElse(null);
-        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeerDTO.id()));
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URI + "/beer/" + testBeerDTO.id())
+                .with(httpBasic(USERNAME, PASSWORD)));
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(beerService).removeBeerById(argumentCaptor.capture());
         assertThat(testBeerDTO.id()).isEqualTo(argumentCaptor.getValue());
