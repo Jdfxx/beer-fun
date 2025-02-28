@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import pl.filiphagno.spring6restmvc.controllers.BeerController;
-import pl.filiphagno.spring6restmvc.controllers.BeerControllerTest;
 import pl.filiphagno.spring6restmvc.controllers.NotFoundException;
 import pl.filiphagno.spring6restmvc.entities.Beer;
 import pl.filiphagno.spring6restmvc.model.BeerDTO;
