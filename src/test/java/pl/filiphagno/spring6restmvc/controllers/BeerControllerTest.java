@@ -41,8 +41,6 @@ import static pl.filiphagno.spring6restmvc.model.BeerStyle.STOUT;
 @Import(SpringSecurityConfig.class)
 public class BeerControllerTest {
 
-    public static final String USERNAME = "user1";
-    public static final String PASSWORD = "password";
     @Autowired
     MockMvc mockMvc;
 

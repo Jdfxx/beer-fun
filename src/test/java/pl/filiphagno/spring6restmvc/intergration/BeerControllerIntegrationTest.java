@@ -34,7 +34,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
-import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.USERNAME;
 import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.getJwt;
 
 @SpringBootTest
@@ -227,7 +226,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void authFailsWithWrongPassword() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
-                        .with(httpBasic("some", BeerControllerTest.PASSWORD)))
+                        .with(httpBasic("some", "some")))
                 .andExpect(status().isUnauthorized());
     }
 
