@@ -116,7 +116,7 @@ public class BeerControllerTest {
                 .andExpect(jsonPath("$.length()", is(3)));
     }
 
-    public static SecurityMockMvcRequestPostProcessors.@NotNull JwtRequestPostProcessor getJwt() {
+    public static SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor getJwt() {
         return jwt().jwt(jwt -> {
             jwt.claims(claims -> {
                         claims.put("scope", "message-read");
