@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static pl.filiphagno.spring6restmvc.controllers.BeerController.BASE_URI;
 import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.USERNAME;
+import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.getJwt;
 
 @SpringBootTest
 public class BeerControllerIntegrationTest {
@@ -153,7 +154,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByName() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
-                .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
+                        .with(getJwt())
                         .queryParam("beerName", "IPA")
                         .queryParam("pageSize", "500"))
                 .andExpect(status().isOk())
@@ -164,7 +165,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByStyle() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
-                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
+                        .with(getJwt())
                         .queryParam("beerStyle", BeerStyle.PORTER.name())
                         .queryParam("pageSize", "500"))
                 .andExpect(status().isOk())
@@ -175,7 +176,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByNameAndStyle() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
-                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
+                        .with(getJwt())
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("beerName", "IPA")
                         .queryParam("pageSize", "500"))
@@ -191,7 +192,7 @@ public class BeerControllerIntegrationTest {
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("showInventory", "true")
                         .queryParam("pageSize", "500")
-                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD)))
+                        .with(getJwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()", is(310)))
                 .andExpect(jsonPath("$.content[0].quantityOnHand").value(IsNull.notNullValue()));
@@ -200,7 +201,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByStyleAndNameShowInventoryFalse() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
-                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
+                        .with(getJwt())
                         .queryParam("beerName", "IPA")
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("showInventory", "false")
@@ -213,7 +214,7 @@ public class BeerControllerIntegrationTest {
     @Test
     void listBeersByStyleAndNameShowInventoryTruePage2() throws Exception {
         mockMvc.perform(get(BASE_URI + "/beers")
-                        .with(httpBasic(USERNAME, BeerControllerTest.PASSWORD))
+                        .with(getJwt())
                         .queryParam("beerName", "IPA")
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("showInventory", "true")

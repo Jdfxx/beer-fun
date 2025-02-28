@@ -25,11 +25,9 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.PASSWORD;
-import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.USERNAME;
+import static pl.filiphagno.spring6restmvc.controllers.BeerControllerTest.*;
 
 @WebMvcTest(CustomerController.class)
 @Import(SpringSecurityConfig.class)
@@ -89,7 +87,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(post("/api/v1/customer")
             .content(objectMapper.writeValueAsString(customerDTO))
-            .with(httpBasic(USERNAME, PASSWORD))
+                        .with(getJwt())
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andExpect(header().exists("Location"))
@@ -107,7 +105,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(post("/api/v1/customer")
                         .content(objectMapper.writeValueAsString(customerDTO))
-                        .with(httpBasic(USERNAME, PASSWORD))
+                        .with(getJwt())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.length()", is(1)));
@@ -119,7 +117,7 @@ class CustomerControllerTest {
         given(customerService.listCustomers()).willReturn(customerDTOList);
 
         mockMvc.perform(get("/api/v1/customers").accept(MediaType.APPLICATION_JSON)
-                .with(httpBasic(USERNAME, PASSWORD)))
+                        .with(getJwt()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()", is(3)));
@@ -133,7 +131,7 @@ class CustomerControllerTest {
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
         mockMvc.perform(get("/api/v1/customer/" + UUID.randomUUID())
-                .with(httpBasic(USERNAME, PASSWORD))
+                        .with(getJwt())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -148,7 +146,7 @@ class CustomerControllerTest {
         given(customerService.getCustomersById(any(UUID.class))).willReturn(Optional.ofNullable(testCustomerDTO));
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomerDTO.id())
-                .with(httpBasic(USERNAME, PASSWORD))
+                .with(getJwt())
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testCustomerDTO))
                 .contentType(MediaType.APPLICATION_JSON));
@@ -166,7 +164,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(put("/api/v1/customer/" + testCustomerDTO.id())
                 .accept(MediaType.APPLICATION_JSON)
-                .with(httpBasic(USERNAME, PASSWORD))
+                        .with(getJwt())
                 .content(objectMapper.writeValueAsString(testCustomerDTO))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -179,7 +177,7 @@ class CustomerControllerTest {
         given(customerService.listCustomers()).willReturn(customerDTOList);
         CustomerDTO testCustomerDTO = customerService.listCustomers().getFirst();
         mockMvc.perform(delete("/api/v1/customer/" + testCustomerDTO.id())
-                .with(httpBasic(USERNAME, PASSWORD)));
+                .with(getJwt()));
         ArgumentCaptor<UUID> argumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(customerService).deleteCustomerById(argumentCaptor.capture());
         assertThat(testCustomerDTO.id()).isEqualTo(argumentCaptor.getValue());
